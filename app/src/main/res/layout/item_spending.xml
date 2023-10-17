@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_marginBottom="1dp"
+    android:paddingHorizontal="20dp"
+    android:paddingVertical="13dp"
+    android:orientation="horizontal"
+    android:gravity="center"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <ImageView
+        android:id="@+id/imv_avt_spending"
+        android:src="@drawable/icon_eat_and_drink"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+    <Space
+        android:layout_width="8dp"
+        android:layout_height="0dp"/>
+    <TextView
+        android:id="@+id/tv_name_diretory"
+        android:layout_weight="1"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:text="Ăn uống"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+    <TextView
+        android:id="@+id/tv_spending_money"
+        android:text="100,000đ"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+</LinearLayout>

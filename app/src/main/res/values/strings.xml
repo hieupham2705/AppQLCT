@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">AppQLCT</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="l_ch">Lịch</string>
+    <string name="kh_ng_c_d_li_u_n_o_c_ghi">Không có dữ liệu nào được ghi</string>
+</resources>
