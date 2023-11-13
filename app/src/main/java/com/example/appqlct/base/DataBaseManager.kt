@@ -27,7 +27,7 @@ abstract class DataBaseManager : RoomDatabase() {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     DataBaseManager::class.java,
-                    "DataBase"
+                    "DataBasee"
                 ).fallbackToDestructiveMigration().build()
                 INSTANCE = instance
                 return instance

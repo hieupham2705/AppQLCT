@@ -4,4 +4,6 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="l_ch">Lịch</string>
     <string name="kh_ng_c_d_li_u_n_o_c_ghi">Không có dữ liệu nào được ghi</string>
+    <string name="chi_ti_u">Chi tiêu</string>
+    <string name="thu_nh_p">Thu nhập</string>
 </resources>

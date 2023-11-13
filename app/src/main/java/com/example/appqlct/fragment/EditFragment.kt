@@ -1,6 +1,7 @@
 package com.example.appqlct.fragment
 
 import android.app.DatePickerDialog
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -9,6 +10,7 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.example.appqlct.R
+import com.example.appqlct.actitities.EditDirectoryActivity
 import com.example.appqlct.adapter.DirectoryAdapter
 import com.example.appqlct.base.DataBaseManager
 import com.example.appqlct.databinding.FragmentEditBinding
@@ -54,10 +56,15 @@ class EditFragment : Fragment() {
     private val adapter by lazy {
         DirectoryAdapter(
             onCickEditDirectory = {
-
+                onCickEditDirectory()
             }
         )
     }
+
+    private fun onCickEditDirectory() {
+        startActivity(Intent(requireContext(), EditDirectoryActivity::class.java))
+    }
+
     private var hieu = true
     var calendar = Calendar.getInstance()
     val year = calendar.get(Calendar.YEAR)
@@ -137,15 +144,17 @@ class EditFragment : Fragment() {
             val spending = Spending(
                 id = 0,
                 tvDay.text.toString(),
+                calendar.get(Calendar.MONTH),
                 edtNote.editText?.text.toString(),
-                edtSpendingMoney.editText?.text.toString(),
+                edtSpendingMoney.editText?.text.toString().toLong(),
                 directory
             )
             val revenue = Revenue(
                 id = 0,
                 tvDay.text.toString(),
+                calendar.get(Calendar.MONTH),
                 edtNote.editText?.text.toString(),
-                edtSpendingMoney.editText?.text.toString(),
+                edtSpendingMoney.editText?.text.toString().toLong(),
                 directory
             )
             if (hieu)

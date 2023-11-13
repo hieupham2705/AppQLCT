@@ -28,6 +28,8 @@ class CalendarFragment : Fragment() {
     private var dateChosse: String = ""
     private val listSpending = mutableListOf<Spending>()
     private val listRevenue = mutableListOf<Revenue>()
+    private val listMoneySpendingInMonth = mutableListOf<Long>()
+    private val listMoneyRevenueInMonth = mutableListOf<Long>()
     private val listAdapter = mutableListOf<SpendingInCalendar>()
     private val adapter by lazy { CalendarAdapter() }
     override fun onCreateView(
@@ -38,6 +40,8 @@ class CalendarFragment : Fragment() {
             dateChosse = "${i3}/${i2 + 1}/${i}"
             listSpending.clear()
             listRevenue.clear()
+            listMoneySpendingInMonth.clear()
+            listMoneyRevenueInMonth.clear()
             CoroutineScope(Dispatchers.Main).launch {
                 listSpending.addAll(
                     DataBaseManager.getInstance(requireContext()).getItemSpendingDAO()
@@ -51,6 +55,28 @@ class CalendarFragment : Fragment() {
                     getList()
                     adapter.setAdapter(dateChosse, listAdapter)
                     Log.e(TAG, "onCreateView: ${listAdapter}")
+                }
+            }
+            CoroutineScope(Dispatchers.Main).launch {
+                listMoneySpendingInMonth.addAll(
+                    DataBaseManager.getInstance(requireContext()).getItemSpendingDAO()
+                        .searchMoneySpending(i2)
+                )
+                val totalSpending = listMoneySpendingInMonth.fold(0) { a, b ->
+                    (a + b).toInt()
+                }
+                binding.tvSpendingMoney.text = totalSpending.toString()
+                CoroutineScope(Dispatchers.Main).launch {
+                    listMoneyRevenueInMonth.addAll(
+                        DataBaseManager.getInstance(requireContext()).getItemRevenueDAO()
+                            .searchMoneyRevenue(i2)
+                    )
+
+                    val totalRevenue = listMoneyRevenueInMonth.fold(0) { a, b ->
+                        (a + b).toInt()
+                    }
+                    binding.tvRevenue.text = totalRevenue.toString()
+                    binding.tvTotal.text = (totalRevenue-totalSpending).toString()
                 }
             }
 
