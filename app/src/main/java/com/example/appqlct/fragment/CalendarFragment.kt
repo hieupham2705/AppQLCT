@@ -20,70 +20,87 @@ import com.example.appqlct.model.SpendingInCalendar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.time.Year
 
 private const val TAG = "CalendarFragment"
 
 class CalendarFragment : Fragment() {
     private val binding by lazy { FragmentCalendarBinding.inflate(layoutInflater) }
-    private var dateChosse: String = ""
     private val listSpending = mutableListOf<Spending>()
     private val listRevenue = mutableListOf<Revenue>()
     private val listMoneySpendingInMonth = mutableListOf<Long>()
     private val listMoneyRevenueInMonth = mutableListOf<Long>()
     private val listAdapter = mutableListOf<SpendingInCalendar>()
     private val adapter by lazy { CalendarAdapter() }
+    private val calendar = Calendar.getInstance()
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding.calendarView2.setOnDateChangeListener { calendarView, i, i2, i3 ->
-            dateChosse = "${i3}/${i2 + 1}/${i}"
+        binding.calendarView2.setOnDateChangeListener { calendarView, i, i1, i2 ->
+            Log.e(TAG, "onCreateView: $i1", )
+            calendar.set(i, i1, i2)
+            getData(i, i1 + 1, i2)
+        }
+        binding.recyclerview.adapter = adapter
+        return binding.root
+    }
+
+    override fun onStart() {
+        getData(
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH) + 1,
+            calendar.get(Calendar.DAY_OF_MONTH)
+        )
+        super.onStart()
+    }
+
+    override fun onResume() {
+        getData(
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH) + 1,
+            calendar.get(Calendar.DAY_OF_MONTH)
+        )
+        super.onResume()
+    }
+
+    private fun getData(year: Int, month: Int, day: Int) {
+        CoroutineScope(Dispatchers.Main).launch {
             listSpending.clear()
             listRevenue.clear()
             listMoneySpendingInMonth.clear()
             listMoneyRevenueInMonth.clear()
-            CoroutineScope(Dispatchers.Main).launch {
-                listSpending.addAll(
-                    DataBaseManager.getInstance(requireContext()).getItemSpendingDAO()
-                        .search(dateChosse)
-                )
-                CoroutineScope(Dispatchers.Main).launch {
-                    listRevenue.addAll(
-                        DataBaseManager.getInstance(requireContext()).getItemRevenueDAO()
-                            .search(dateChosse)
-                    )
-                    getList()
-                    adapter.setAdapter(dateChosse, listAdapter)
-                    Log.e(TAG, "onCreateView: ${listAdapter}")
-                }
-            }
-            CoroutineScope(Dispatchers.Main).launch {
-                listMoneySpendingInMonth.addAll(
-                    DataBaseManager.getInstance(requireContext()).getItemSpendingDAO()
-                        .searchMoneySpending(i2)
-                )
-                val totalSpending = listMoneySpendingInMonth.fold(0) { a, b ->
-                    (a + b).toInt()
-                }
-                binding.tvSpendingMoney.text = totalSpending.toString()
-                CoroutineScope(Dispatchers.Main).launch {
-                    listMoneyRevenueInMonth.addAll(
-                        DataBaseManager.getInstance(requireContext()).getItemRevenueDAO()
-                            .searchMoneyRevenue(i2)
-                    )
+            listSpending.addAll(
+                DataBaseManager.getInstance(requireContext()).getItemSpendingDAO()
+                    .search("${day}/${month}/${year}")
+            )
+            listRevenue.addAll(
+                DataBaseManager.getInstance(requireContext()).getItemRevenueDAO()
+                    .search("${day}/${month}/${year}")
+            )
+            listMoneySpendingInMonth.addAll(
+                DataBaseManager.getInstance(requireContext()).getItemSpendingDAO()
+                    .searchMoneySpending(month)
+            )
+            listMoneyRevenueInMonth.addAll(
+                DataBaseManager.getInstance(requireContext()).getItemRevenueDAO()
+                    .searchMoneyRevenue(month)
+            )
+            Log.e(TAG, "getData: $month", )
+            getList()
+            adapter.setAdapter("${day}/${month}/${year}", listAdapter)
+            Log.e(TAG, "onCreateView: ${listAdapter}")
 
-                    val totalRevenue = listMoneyRevenueInMonth.fold(0) { a, b ->
-                        (a + b).toInt()
-                    }
-                    binding.tvRevenue.text = totalRevenue.toString()
-                    binding.tvTotal.text = (totalRevenue-totalSpending).toString()
-                }
+            val totalSpending = listMoneySpendingInMonth.fold(0) { a, b ->
+                (a + b).toInt()
             }
-
-            Log.e(TAG, "onCreateView: ${dateChosse}")
+            binding.tvSpendingMoney.text = totalSpending.toString() + " đ"
+            val totalRevenue = listMoneyRevenueInMonth.fold(0) { a, b ->
+                (a + b).toInt()
+            }
+            binding.tvRevenue.text = totalRevenue.toString() + " đ"
+            binding.tvTotal.text = (totalRevenue - totalSpending).toString() + " đ"
         }
-        binding.recyclerview.adapter = adapter
-        return binding.root
     }
 
     private fun getList() {

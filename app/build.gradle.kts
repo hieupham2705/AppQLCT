@@ -14,6 +14,7 @@ android {
         targetSdk = 33
         versionCode = 1
         versionName = "1.0"
+        multiDexEnabled = true
         vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -33,9 +34,6 @@ android {
     }
     kotlinOptions {
         jvmTarget = "17"
-    }
-    dataBinding{
-        enable = true
     }
     buildFeatures {
         viewBinding = true
@@ -61,4 +59,6 @@ dependencies {
     implementation ("androidx.room:room-ktx:$room_version")
     annotationProcessor("androidx.room:room-compiler:$room_version")
     implementation ("com.github.PhilJay:MPAndroidChart:v3.1.0")
+    // https://mvnrepository.com/artifact/com.github.AnyChart/AnyChart-Android
+    implementation("com.github.AnyChart:AnyChart-Android:3.0.0")
 }

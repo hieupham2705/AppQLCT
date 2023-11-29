@@ -6,4 +6,7 @@
     <string name="kh_ng_c_d_li_u_n_o_c_ghi">Không có dữ liệu nào được ghi</string>
     <string name="chi_ti_u">Chi tiêu</string>
     <string name="thu_nh_p">Thu nhập</string>
+    <string name="t_ng">Tổng</string>
+    <string name="name">Name</string>
+    <string name="chia_tien">Chia tiền</string>
 </resources>

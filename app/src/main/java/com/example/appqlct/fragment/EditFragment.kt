@@ -41,8 +41,7 @@ class EditFragment : Fragment() {
             Directory(R.drawable.icon_electricity_bill, "Tiền điện"),
             Directory(R.drawable.icon_go, "Đi lại"),
             Directory(R.drawable.icon_bill_contact, "Phí liên lạc"),
-            Directory(R.drawable.icon_bill_home, "Tiền nhà"),
-            Directory(0, "Chỉnh sửa")
+            Directory(R.drawable.icon_bill_home, "Tiền nhà")
         )
     private val listDirectoryRevenue =
         mutableListOf<Directory>(
@@ -50,8 +49,7 @@ class EditFragment : Fragment() {
             Directory(R.drawable.icon_allowance, "Tiền phụ cấp"),
             Directory(R.drawable.icon_bonus, "Tiền thưởng"),
             Directory(R.drawable.icon_investment_money, "Đầu tư"),
-            Directory(R.drawable.icon_supplementary_income, "Thu nhập phụ"),
-            Directory(0, "Chỉnh sửa"),
+            Directory(R.drawable.icon_supplementary_income, "Thu nhập phụ")
         )
     private val adapter by lazy {
         DirectoryAdapter(
@@ -125,7 +123,8 @@ class EditFragment : Fragment() {
             requireContext(), { view, yearPicker, monthPicker, dayOfMonthPicker ->
                 // Xử lý khi người dùng chọn ngày
                 calendar.set(Calendar.YEAR, yearPicker)
-                calendar.set(Calendar.MONTH, monthPicker)
+                calendar.set(Calendar.MONTH + 1, monthPicker)
+                Log.e(TAG, "onClickday: $monthPicker", )
                 calendar.set(Calendar.DAY_OF_MONTH, dayOfMonthPicker)
                 val selectedDate =
                     "${calendar.get(Calendar.DAY_OF_MONTH)}/${calendar.get(Calendar.MONTH) + 1}/${
@@ -144,7 +143,7 @@ class EditFragment : Fragment() {
             val spending = Spending(
                 id = 0,
                 tvDay.text.toString(),
-                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.MONTH)+1,
                 edtNote.editText?.text.toString(),
                 edtSpendingMoney.editText?.text.toString().toLong(),
                 directory
@@ -153,7 +152,7 @@ class EditFragment : Fragment() {
                 id = 0,
                 tvDay.text.toString(),
                 calendar.get(Calendar.MONTH),
-                edtNote.editText?.text.toString(),
+                edtNote.editText?.text.toString()+1,
                 edtSpendingMoney.editText?.text.toString().toLong(),
                 directory
             )

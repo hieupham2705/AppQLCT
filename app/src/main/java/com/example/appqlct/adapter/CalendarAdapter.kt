@@ -64,7 +64,7 @@ class CalendarAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         }
         if (holder is SpendingViewHolder) {
             holder.binding.apply {
-                listSpending[position - 1].avtSpending?.let { imvAvtSpending.setImageResource(it) }
+//                listSpending[position - 1].avtSpending?.let { imvAvtSpending.setImageResource(it) }
                 tvNameDiretory.text = listSpending[position - 1].directory
                 if (listSpending[position - 1].check == true)
                     tvSpendingMoney.text = "-" + listSpending[position - 1].money

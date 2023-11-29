@@ -100,6 +100,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
+                        android:textColor="#f84735"
                         android:gravity="end" />
                 </LinearLayout>
 
@@ -151,13 +152,14 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:gravity="start"
-                    android:text="@string/thu_nh_p" />
+                    android:text="@string/t_ng" />
 
                 <TextView
                     android:id="@+id/tv_total"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:textColor="#f84735"
                     android:gravity="end" />
             </LinearLayout>
 
@@ -171,10 +173,15 @@
                 app:tabSelectedTextColor="@color/pink"
                 app:tabMode="fixed" />
 
-            <com.github.mikephil.charting.charts.PieChart
-                android:id="@+id/pieChart"
+            <com.anychart.anychart.AnyChartView
+                android:id="@+id/anyChart"
                 android:layout_width="match_parent"
                 android:layout_height="400dp" />
-        </LinearLayout>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerview"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+/>        </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </FrameLayout>

@@ -7,11 +7,6 @@
     android:gravity="center"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
-    <ImageView
-        android:id="@+id/imv_avt_spending"
-        android:src="@drawable/icon_eat_and_drink"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
     <Space
         android:layout_width="8dp"
         android:layout_height="0dp"/>
