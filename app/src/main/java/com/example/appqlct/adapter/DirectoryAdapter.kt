@@ -1,13 +1,12 @@
 package com.example.appqlct.adapter
 
-import android.util.Log
-import android.util.SparseBooleanArray
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.appqlct.R
-import com.example.appqlct.databinding.FragmentEditBinding
 import com.example.appqlct.databinding.ItemDirectoryBinding
+import com.example.appqlct.extension.decodeBase64ToBitmap
+import com.example.appqlct.model.DanhMuc
 import com.example.appqlct.model.Directory
 
 private const val TAG = "DirectoryAdapter"
@@ -15,7 +14,7 @@ private const val TAG = "DirectoryAdapter"
 class DirectoryAdapter(
     private val onCickEditDirectory: () -> Unit
 ) : RecyclerView.Adapter<DirectoryAdapter.ViewHolder>() {
-    private val listDirectory = mutableListOf<Directory>()
+    private val listDirectory = mutableListOf<DanhMuc>()
     private var item = 0
     private var directory = "Ăn uống"
 
@@ -31,8 +30,8 @@ class DirectoryAdapter(
 
     override fun onBindViewHolder(holder: DirectoryAdapter.ViewHolder, position: Int) {
         holder.binding.apply {
-            listDirectory[position].image?.let { imvDirectory.setImageResource(it) }
-            tvNameDiretory.text = listDirectory[position].text
+            imvDirectory.setImageBitmap(decodeBase64ToBitmap(listDirectory[position].icon!!))
+            tvNameDiretory.text = listDirectory[position].tenDanhMuc
             root.setOnClickListener {
                 val i = position
                 item = i
@@ -44,7 +43,7 @@ class DirectoryAdapter(
             }
             if (position == item) {
                 root.setBackgroundResource(R.drawable.border_btn_tienthu)
-            }else
+            } else
                 root.setBackgroundResource(R.drawable.border_directory)
 
         }
@@ -52,11 +51,19 @@ class DirectoryAdapter(
 
 
     override fun getItemCount(): Int = listDirectory.size
-    fun setAdapter(list: List<Directory>) {
+    fun setAdapter(list: List<DanhMuc>) {
         listDirectory.clear()
         listDirectory.addAll(list)
+        listDirectory.add(DanhMuc(tenDanhMuc = "Chỉnh sửa"))
         notifyDataSetChanged()
     }
-    fun getDirectory():String{return directory}
+
+    fun getDirectory(): String {
+        return directory
+    }
+
+    fun getImage(): String {
+        return listDirectory.get(item).icon!!
+    }
 }
 

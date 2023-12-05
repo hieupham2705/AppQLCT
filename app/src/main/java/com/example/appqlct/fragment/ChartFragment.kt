@@ -1,26 +1,23 @@
 package com.example.appqlct.fragment
 
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import com.anychart.anychart.AnyChart
 import com.anychart.anychart.DataEntry
-import com.anychart.anychart.Pie
 import com.anychart.anychart.ValueDataEntry
 import com.example.appqlct.adapter.ChartAdapter
 import com.example.appqlct.base.DataBaseManager
 import com.example.appqlct.databinding.FragmentChartBinding
-import com.example.appqlct.model.Revenue
-import com.example.appqlct.model.Spending
 import com.example.appqlct.model.SpendingInChart
 import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.lang.Exception
 import java.util.Calendar
 
 private const val TAG = "ChartFragment"
@@ -40,7 +37,7 @@ class ChartFragment : Fragment() {
         binding.tapLayout.addTab(binding.tapLayout.newTab().setText("Chi tiêu"))
         binding.tapLayout.addTab(binding.tapLayout.newTab().setText("Thu nhập"))
         createDataChart()
-        binding.tvMonth.text = "Tháng " + calendar.get(Calendar.MONTH).toString()
+        binding.tvMonth.text = "Tháng " + (calendar.get(Calendar.MONTH) + 1).toString()
         binding.tapLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
                 when (tab?.position) {
@@ -95,40 +92,57 @@ class ChartFragment : Fragment() {
             val dataEntries = mutableListOf<DataEntry>()
             val spendingInChart = mutableListOf<SpendingInChart>()
             spd = 0
-            DataBaseManager.getInstance(requireContext()).getItemSpendingDAO()
-                .searchSpending(calendar.get(Calendar.MONTH)).groupBy { it.directory }
-                .forEach { (_directory, _spendings) ->
+            DataBaseManager.getInstance(requireContext()).getItemDAO()
+                .timKiemGiaoDichChiBieuDo(calendar.get(Calendar.MONTH) + 1).groupBy { it.TenDanhMuc }
+                ?.forEach { (_directory, _spendings) ->
                     val s = SpendingInChart(
+                        _spendings.sumByDouble { it.Tien!!.toDouble() }.toLong(),
                         _directory,
-                        _spendings.sumByDouble { it.money.toDouble() }.toLong()
+                        _spendings.get(0).Icon
                     )
                     spendingInChart.add(s)
-                    dataEntries.add(ValueDataEntry(s.directory, s.money))
-                    spd -= s.money!!.toInt()
+                    dataEntries.add(ValueDataEntry(s.TenDanhMuc, s.Tien))
+                    spd -= s.Tien!!.toInt()
                 }
             updateTotal()
-            pie.setData(dataEntries)
+            if (dataEntries.isEmpty()) {
+                binding.anyChart.isGone = true
+                binding.tvNothing.isVisible = true
+            } else {
+                pie.setData(dataEntries)
+                binding.anyChart.isVisible = true
+                binding.tvNothing.isGone = true
+            }
             adapter.setAdapter(spendingInChart)
         }
     }
+
     private fun revenueAdapter() {
         CoroutineScope(Dispatchers.Main).launch {
             val dataEntries = mutableListOf<DataEntry>()
             val spendingInChart = mutableListOf<SpendingInChart>()
             rv = 0
-            DataBaseManager.getInstance(requireContext()).getItemRevenueDAO()
-                .searchRevenue(calendar.get(Calendar.MONTH)).groupBy { it.directory }
-                .forEach { (_directory, _spendings) ->
+            DataBaseManager.getInstance(requireContext()).getItemDAO()
+                .timKiemGiaoDichThuBieuDo(calendar.get(Calendar.MONTH) + 1).groupBy { it.TenDanhMuc }
+                ?.forEach { (_directory, _spendings) ->
                     val s = SpendingInChart(
+                        _spendings.sumByDouble { it.Tien!!.toDouble() }.toLong(),
                         _directory,
-                        _spendings.sumByDouble { it.money.toDouble() }.toLong()
+                        _spendings.get(0).Icon
                     )
                     spendingInChart.add(s)
-                    dataEntries.add(ValueDataEntry(s.directory, s.money))
-                    rv += s.money!!.toInt()
+                    dataEntries.add(ValueDataEntry(s.TenDanhMuc, s.Tien))
+                    rv += s.Tien!!.toInt()
                 }
             updateTotal()
-            pie.setData(dataEntries)
+            if (dataEntries.isEmpty()) {
+                binding.anyChart.isGone = true
+                binding.tvNothing.isVisible = true
+            } else {
+                pie.setData(dataEntries)
+                binding.anyChart.isVisible = true
+                binding.tvNothing.isGone = true
+            }
             adapter.setAdapter(spendingInChart)
         }
     }
@@ -143,13 +157,16 @@ class ChartFragment : Fragment() {
         spendingAdapter()
         binding.anyChart.setChart(pie)
     }
-    private fun check(){
+
+    private fun check() {
         when (binding.tapLayout.selectedTabPosition) {
             0 -> {
+                revenueAdapter()
                 spendingAdapter()
             }
 
             else -> {
+                spendingAdapter()
                 revenueAdapter()
             }
         }

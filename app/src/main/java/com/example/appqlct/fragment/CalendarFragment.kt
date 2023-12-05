@@ -3,42 +3,36 @@ package com.example.appqlct.fragment
 import android.icu.util.Calendar
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.get
-import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.LayoutManager
-import com.example.appqlct.R
+import androidx.fragment.app.Fragment
 import com.example.appqlct.adapter.CalendarAdapter
 import com.example.appqlct.base.DataBaseManager
 import com.example.appqlct.databinding.FragmentCalendarBinding
-import com.example.appqlct.model.Revenue
-import com.example.appqlct.model.Spending
+import com.example.appqlct.model.GiaoDich
 import com.example.appqlct.model.SpendingInCalendar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.time.Year
+
 
 private const val TAG = "CalendarFragment"
 
 class CalendarFragment : Fragment() {
     private val binding by lazy { FragmentCalendarBinding.inflate(layoutInflater) }
-    private val listSpending = mutableListOf<Spending>()
-    private val listRevenue = mutableListOf<Revenue>()
+    private val listSpending = mutableListOf<GiaoDich>()
     private val listMoneySpendingInMonth = mutableListOf<Long>()
     private val listMoneyRevenueInMonth = mutableListOf<Long>()
     private val listAdapter = mutableListOf<SpendingInCalendar>()
-    private val adapter by lazy { CalendarAdapter() }
+    private val adapter by lazy { CalendarAdapter(requireContext()) }
     private val calendar = Calendar.getInstance()
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         binding.calendarView2.setOnDateChangeListener { calendarView, i, i1, i2 ->
-            Log.e(TAG, "onCreateView: $i1", )
+            Log.e(TAG, "onCreateView: $i1")
             calendar.set(i, i1, i2)
             getData(i, i1 + 1, i2)
         }
@@ -67,29 +61,24 @@ class CalendarFragment : Fragment() {
     private fun getData(year: Int, month: Int, day: Int) {
         CoroutineScope(Dispatchers.Main).launch {
             listSpending.clear()
-            listRevenue.clear()
             listMoneySpendingInMonth.clear()
             listMoneyRevenueInMonth.clear()
             listSpending.addAll(
-                DataBaseManager.getInstance(requireContext()).getItemSpendingDAO()
-                    .search("${day}/${month}/${year}")
-            )
-            listRevenue.addAll(
-                DataBaseManager.getInstance(requireContext()).getItemRevenueDAO()
-                    .search("${day}/${month}/${year}")
+                DataBaseManager.getInstance(requireContext()).getItemDAO()
+                    .timKiemGiaoDichChiTheoNgayThangNam(day,month,year)
             )
             listMoneySpendingInMonth.addAll(
-                DataBaseManager.getInstance(requireContext()).getItemSpendingDAO()
-                    .searchMoneySpending(month)
+                DataBaseManager.getInstance(requireContext()).getItemDAO()
+                    .timKiemGiaoDichChiTheoThang(month)
             )
             listMoneyRevenueInMonth.addAll(
-                DataBaseManager.getInstance(requireContext()).getItemRevenueDAO()
-                    .searchMoneyRevenue(month)
+                DataBaseManager.getInstance(requireContext()).getItemDAO()
+                    .timKiemGiaoDichThuTheoThang(month)
             )
-            Log.e(TAG, "getData: $month", )
+            Log.e(TAG, "getData: $month")
             getList()
             adapter.setAdapter("${day}/${month}/${year}", listAdapter)
-            Log.e(TAG, "onCreateView: ${listAdapter}")
+            Log.e(TAG, "onCreateView: ${listMoneyRevenueInMonth}")
 
             val totalSpending = listMoneySpendingInMonth.fold(0) { a, b ->
                 (a + b).toInt()
@@ -106,13 +95,10 @@ class CalendarFragment : Fragment() {
     private fun getList() {
         listAdapter.clear()
         listSpending.forEach {
-            var spendingInCalendar = SpendingInCalendar(0, it.directory, it.money, true)
-            listAdapter.add(spendingInCalendar)
-        }
-        listRevenue.forEach {
-            var spendingInCalendar = SpendingInCalendar(0, it.directory, it.money, false)
+            var spendingInCalendar = SpendingInCalendar(0, it.idDanhMuc, it.tien, true)
             listAdapter.add(spendingInCalendar)
         }
     }
+
 
 }

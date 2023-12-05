@@ -1,19 +1,22 @@
 package com.example.appqlct.actitities
 
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2
 import com.etebarian.meowbottomnavigation.MeowBottomNavigation
 import com.example.appqlct.R
 import com.example.appqlct.adapter.ViewPagerAdapter
+import com.example.appqlct.base.DataBaseManager
 import com.example.appqlct.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
-    private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
+    val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+        val database = DataBaseManager.getInstance(applicationContext)
         binding.meowbottomnavigation.add(MeowBottomNavigation.Model(0, R.drawable.pencil))
         binding.meowbottomnavigation.add(
             MeowBottomNavigation.Model(
@@ -53,9 +56,5 @@ class MainActivity : AppCompatActivity() {
                 binding.meowbottomnavigation.show(position,true)
             }
         })
-    }
-
-    fun setFragment(fragment: Fragment) {
-        supportFragmentManager.beginTransaction().replace(R.id.viewpager, fragment, "").commit()
     }
 }

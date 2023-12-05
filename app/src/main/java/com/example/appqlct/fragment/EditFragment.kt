@@ -15,10 +15,11 @@ import com.example.appqlct.adapter.DirectoryAdapter
 import com.example.appqlct.base.DataBaseManager
 import com.example.appqlct.databinding.FragmentEditBinding
 import com.example.appqlct.define.Constants
+import com.example.appqlct.extension.convertDrawableToBase64
 import com.example.appqlct.extension.showToast
+import com.example.appqlct.model.DanhMuc
 import com.example.appqlct.model.Directory
-import com.example.appqlct.model.Revenue
-import com.example.appqlct.model.Spending
+import com.example.appqlct.model.GiaoDich
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -29,28 +30,8 @@ private const val TAG = "EditFragment"
 class EditFragment : Fragment() {
 
     private val binding by lazy { FragmentEditBinding.inflate(layoutInflater) }
-    private val listDirectorySpendingMoney =
-        mutableListOf<Directory>(
-            Directory(R.drawable.icon_eat_and_drink, "Ăn uống"),
-            Directory(R.drawable.icon_daily_spending, "Chi tiêu hàng ngày"),
-            Directory(R.drawable.icon_cloths, "Quần áo"),
-            Directory(R.drawable.icon_cosmetics, "Mỹ phẩm"),
-            Directory(R.drawable.icon_communication_fee, "Phí giao lưu"),
-            Directory(R.drawable.icon_medical, "Y tế"),
-            Directory(R.drawable.icon_education, "Giáo dục"),
-            Directory(R.drawable.icon_electricity_bill, "Tiền điện"),
-            Directory(R.drawable.icon_go, "Đi lại"),
-            Directory(R.drawable.icon_bill_contact, "Phí liên lạc"),
-            Directory(R.drawable.icon_bill_home, "Tiền nhà")
-        )
-    private val listDirectoryRevenue =
-        mutableListOf<Directory>(
-            Directory(R.drawable.icon_salary, "Tiền lương"),
-            Directory(R.drawable.icon_allowance, "Tiền phụ cấp"),
-            Directory(R.drawable.icon_bonus, "Tiền thưởng"),
-            Directory(R.drawable.icon_investment_money, "Đầu tư"),
-            Directory(R.drawable.icon_supplementary_income, "Thu nhập phụ")
-        )
+    private val listDirectorySpendingMoney = mutableListOf<DanhMuc>()
+    private val listDirectoryRevenue = mutableListOf<DanhMuc>()
     private val adapter by lazy {
         DirectoryAdapter(
             onCickEditDirectory = {
@@ -72,7 +53,7 @@ class EditFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        adapter.setAdapter(listDirectorySpendingMoney)
+        getDanhMuc()
         binding.apply {
             recyclerview.adapter = adapter
             btnAccept.setOnClickListener {
@@ -124,7 +105,7 @@ class EditFragment : Fragment() {
                 // Xử lý khi người dùng chọn ngày
                 calendar.set(Calendar.YEAR, yearPicker)
                 calendar.set(Calendar.MONTH + 1, monthPicker)
-                Log.e(TAG, "onClickday: $monthPicker", )
+                Log.e(TAG, "onClickday: $monthPicker")
                 calendar.set(Calendar.DAY_OF_MONTH, dayOfMonthPicker)
                 val selectedDate =
                     "${calendar.get(Calendar.DAY_OF_MONTH)}/${calendar.get(Calendar.MONTH) + 1}/${
@@ -139,35 +120,25 @@ class EditFragment : Fragment() {
 
     private fun updateSpending() {
         binding.apply {
-            val directory = adapter.getDirectory()
-            val spending = Spending(
-                id = 0,
-                tvDay.text.toString(),
-                calendar.get(Calendar.MONTH)+1,
-                edtNote.editText?.text.toString(),
-                edtSpendingMoney.editText?.text.toString().toLong(),
-                directory
+            val danhMuc = DanhMuc(
+                icon = adapter.getImage(),
+                tenDanhMuc = adapter.getDirectory()
             )
-            val revenue = Revenue(
-                id = 0,
-                tvDay.text.toString(),
-                calendar.get(Calendar.MONTH),
-                edtNote.editText?.text.toString()+1,
-                edtSpendingMoney.editText?.text.toString().toLong(),
-                directory
+            val giaoDich = GiaoDich(
+                ngayGiaoDich = calendar.get(Calendar.DAY_OF_MONTH),
+                thangGiaoDich = calendar.get(Calendar.MONTH) + 1,
+                namGiaoDich = calendar.get(Calendar.YEAR),
+                tien = edtSpendingMoney.editText?.text.toString().toLong(),
+                ghiChu = edtNote.editText?.text.toString(),
+                thuChi = hieu
             )
-            if (hieu)
-                CoroutineScope(Dispatchers.Main).launch {
-                    DataBaseManager.getInstance(requireContext()).getItemSpendingDAO()
-                        .insert(spending)
-                    showToast(Constants.ADD_SUCCESSFUL)
-                }
-            else
-                CoroutineScope(Dispatchers.Main).launch {
-                    DataBaseManager.getInstance(requireContext()).getItemRevenueDAO()
-                        .insert(revenue)
-                    showToast(Constants.ADD_SUCCESSFUL)
-                }
+            CoroutineScope(Dispatchers.Main).launch {
+                giaoDich.idDanhMuc = DataBaseManager.getInstance(requireContext()).getItemDAO()
+                    .themDanhMuc(danhMuc).toInt()
+                DataBaseManager.getInstance(requireContext()).getItemDAO()
+                    .themNguoiGiaoDich(giaoDich)
+                showToast(Constants.ADD_SUCCESSFUL)
+            }
         }
     }
 
@@ -199,5 +170,18 @@ class EditFragment : Fragment() {
         super.onStart()
         binding.tvDay.text = "$dayOfMonth/${month + 1}/$year"
         Log.e(TAG, "onDestroyView: hihi")
+    }
+    private fun getDanhMuc(){
+        CoroutineScope(Dispatchers.Main).launch {
+            listDirectorySpendingMoney.clear()
+            listDirectoryRevenue.clear()
+            listDirectorySpendingMoney.addAll(
+                DataBaseManager.getInstance(requireContext()).getItemDAO().timKiemDanhMucChi()
+            )
+            listDirectoryRevenue.addAll(
+                DataBaseManager.getInstance(requireContext()).getItemDAO().timKiemDanhMucThu()
+            )
+            adapter.setAdapter(listDirectorySpendingMoney)
+        }
     }
 }

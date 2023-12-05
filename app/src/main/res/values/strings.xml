@@ -9,4 +9,7 @@
     <string name="t_ng">Tổng</string>
     <string name="name">Name</string>
     <string name="chia_tien">Chia tiền</string>
+    <string name="thong_bao">Thông báo</string>
+    <string name="delete_all">Xóa tất cả dữ liệu</string>
+    <string name="kh_ng_c_b_n_ghi_n_o_c">không có bản ghi nào cả</string>
 </resources>
