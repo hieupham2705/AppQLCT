@@ -1,6 +1,7 @@
 package com.example.appqlct.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -40,6 +41,9 @@ interface Daoo {
     suspend fun timKiemGiaoDichChiBieuDo(thang: Int): List<SpendingInChart>
     @Query("SELECT GiaoDich.Tien, DanhMuc.TenDanhMuc, DanhMuc.Icon FROM GiaoDich INNER JOIN DanhMuc ON GiaoDich.IdDanhMuc = DanhMuc.Id where GiaoDich.ThangGiaoDich = :thang and GiaoDich.ThuChi = 0")
     suspend fun timKiemGiaoDichThuBieuDo(thang: Int): List<SpendingInChart>
+
+    @Query("DELETE FROM giaodich where Id = :id")
+    suspend fun xoaGiaoDich(id : Long)
     // Danhmucdao
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun themDanhMuc(danhMuc: DanhMuc): Long
@@ -49,6 +53,8 @@ interface Daoo {
     suspend fun timKiemDanhMucChi(): List<DanhMuc>
     @Query("select * from DanhMuc where ThuChi = 0")
     suspend fun timKiemDanhMucThu(): List<DanhMuc>
+    @Query("DELETE FROM DanhMuc where Id = :id")
+    suspend fun xoaDanhMuc(id : Long)
     // nguoi dung dao
 
     @Query("select * from NguoiDung where IdHoaDon = :idHoaDon")

@@ -1,5 +1,6 @@
 package com.example.appqlct.fragment
 
+import android.app.AlertDialog
 import android.icu.util.Calendar
 import android.os.Bundle
 import android.util.Log
@@ -26,7 +27,12 @@ class CalendarFragment : Fragment() {
     private val listMoneySpendingInMonth = mutableListOf<Long>()
     private val listMoneyRevenueInMonth = mutableListOf<Long>()
     private val listAdapter = mutableListOf<SpendingInCalendar>()
-    private val adapter by lazy { CalendarAdapter(requireContext()) }
+    private val adapter by lazy {
+        CalendarAdapter(
+            ::onClickDelete,
+            requireContext()
+        )
+    }
     private val calendar = Calendar.getInstance()
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -66,7 +72,7 @@ class CalendarFragment : Fragment() {
             listMoneyRevenueInMonth.clear()
             listSpending.addAll(
                 DataBaseManager.getInstance(requireContext()).getItemDAO()
-                    .timKiemGiaoDichChiTheoNgayThangNam(day,month,year)
+                    .timKiemGiaoDichChiTheoNgayThangNam(day, month, year)
             )
             listMoneySpendingInMonth.addAll(
                 DataBaseManager.getInstance(requireContext()).getItemDAO()
@@ -96,10 +102,49 @@ class CalendarFragment : Fragment() {
     private fun getList() {
         listAdapter.clear()
         listSpending.forEach {
-            var spendingInCalendar = SpendingInCalendar(0, it.idDanhMuc, it.tien, true)
+            var spendingInCalendar = SpendingInCalendar(0, it.idDanhMuc, it.Id, it.tien, it.thuChi)
             listAdapter.add(spendingInCalendar)
         }
     }
 
+    private fun onClickDelete() {
+        showYesNoDialog()
+    }
 
+    private fun showYesNoDialog()  {
+        val builder = AlertDialog.Builder(context)
+
+        // Thiết lập tiêu đề và nội dung của dialog
+        builder.setTitle("Câu hỏi")
+            .setMessage(
+                "Bạn có chắc chắn muốn xóa mục? Thao tác này không thể\n" +
+                        "hoàn tác lại."
+            )
+
+        // Thiết lập nút Yes
+        builder.setPositiveButton("Yes") { dialog, which ->
+            lifecycleScope.launch {
+                DataBaseManager.getInstance(requireContext()).getItemDAO().xoaGiaoDich(
+                    id = adapter.getIdGiaoDich()
+                        .toLong()
+                )
+                getData(
+                    calendar.get(Calendar.YEAR),
+                    calendar.get(Calendar.MONTH) + 1,
+                    calendar.get(Calendar.DAY_OF_MONTH)
+                )
+            }
+
+            dialog.dismiss()
+        }
+
+        // Thiết lập nút No
+        builder.setNegativeButton("No") { dialog, which ->
+            dialog.dismiss()
+        }
+
+        // Hiển thị dialog
+        val dialog: AlertDialog = builder.create()
+        dialog.show()
+    }
 }

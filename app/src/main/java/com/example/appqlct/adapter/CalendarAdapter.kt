@@ -21,11 +21,15 @@ import kotlinx.coroutines.launch
 
 private const val TAG = "CalendarAdapter"
 
-class CalendarAdapter(private val context: Context) :
+class CalendarAdapter(
+    private val onClickDelete: () -> Unit,
+    private val context: Context
+) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private val typeTime = 0;
     private val typeSpending = 1;
     private var time = ""
+    private var id = 0
     private val listSpending = mutableListOf<SpendingInCalendar>()
 
     class TimeViewHolder(val binding: ItemTimeBinding) : RecyclerView.ViewHolder(binding.root) {
@@ -66,6 +70,7 @@ class CalendarAdapter(private val context: Context) :
                 listSpending[position - 1].avtSpending?.let { imvAvtSpending.setImageResource(it) }
                 root.setOnLongClickListener {
                     showPopupMenu(holder.itemView)
+                    id = listSpending[position-1].idGiaoDich!!
                     true
                 }
                 CoroutineScope(Dispatchers.Main).launch {
@@ -92,23 +97,18 @@ class CalendarAdapter(private val context: Context) :
         notifyDataSetChanged()
     }
 
+    fun getIdGiaoDich(): Int = id
     private fun showPopupMenu(view: View) {
         val popupMenu = PopupMenu(context, view)
         val inflater = popupMenu.menuInflater
-        inflater.inflate(com.example.appqlct.R.menu.menu_directory, popupMenu.menu)
+        inflater.inflate(com.example.appqlct.R.menu.menu_giaodich, popupMenu.menu)
 
         popupMenu.setOnMenuItemClickListener { item: MenuItem ->
             when (item.itemId) {
-                com.example.appqlct.R.id.edit -> {
-
-                    true
-                }
-
                 com.example.appqlct.R.id.delete -> {
-
+                    onClickDelete.invoke()
                     true
                 }
-
                 else -> false
             }
         }

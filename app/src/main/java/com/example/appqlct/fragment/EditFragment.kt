@@ -120,10 +120,6 @@ class EditFragment : Fragment() {
 
     private fun updateSpending() {
         binding.apply {
-            val danhMuc = DanhMuc(
-                icon = adapter.getImage(),
-                tenDanhMuc = adapter.getDirectory()
-            )
             val giaoDich = GiaoDich(
                 ngayGiaoDich = calendar.get(Calendar.DAY_OF_MONTH),
                 thangGiaoDich = calendar.get(Calendar.MONTH) + 1,
@@ -132,13 +128,18 @@ class EditFragment : Fragment() {
                 ghiChu = edtNote.editText?.text.toString(),
                 thuChi = hieu
             )
+            if (hieu)
+                giaoDich.idDanhMuc = listDirectorySpendingMoney[adapter.getIndex()].Id
+            else
+                giaoDich.idDanhMuc = listDirectoryRevenue[adapter.getIndex()].Id
             lifecycleScope.launch {
-                giaoDich.idDanhMuc = DataBaseManager.getInstance(requireContext()).getItemDAO()
-                    .themDanhMuc(danhMuc).toInt()
                 DataBaseManager.getInstance(requireContext()).getItemDAO()
                     .themNguoiGiaoDich(giaoDich)
+
                 showToast(Constants.ADD_SUCCESSFUL)
             }
+            edtNote.editText?.text = null
+            edtSpendingMoney.editText?.text = null
         }
     }
 
@@ -195,6 +196,9 @@ class EditFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        getDanhMucChi()
+        if (hieu)
+            getDanhMucChi()
+        else
+            getDanhMucThu()
     }
 }

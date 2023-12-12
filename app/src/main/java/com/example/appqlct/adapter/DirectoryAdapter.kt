@@ -15,7 +15,7 @@ class DirectoryAdapter(
     private val onCickEditDirectory: () -> Unit
 ) : RecyclerView.Adapter<DirectoryAdapter.ViewHolder>() {
     private val listDirectory = mutableListOf<DanhMuc>()
-    private var item = 0
+    private var index = 0
     private var directory = "Ăn uống"
 
     class ViewHolder(val binding: ItemDirectoryBinding) : RecyclerView.ViewHolder(binding.root) {
@@ -34,14 +34,14 @@ class DirectoryAdapter(
             tvNameDiretory.text = listDirectory[position].tenDanhMuc
             root.setOnClickListener {
                 val i = position
-                item = i
+                index = i
                 directory = tvNameDiretory.text.toString()
                 if (position != listDirectory.size - 1) {
                     notifyDataSetChanged()
                 } else
                     onCickEditDirectory.invoke()
             }
-            if (position == item) {
+            if (position == index) {
                 root.setBackgroundResource(R.drawable.border_btn_tienthu)
             } else
                 root.setBackgroundResource(R.drawable.border_directory)
@@ -58,12 +58,8 @@ class DirectoryAdapter(
         notifyDataSetChanged()
     }
 
-    fun getDirectory(): String {
-        return directory
-    }
-
-    fun getImage(): String {
-        return listDirectory.get(item).icon!!
+    fun getIndex(): Int {
+        return index
     }
 }
 

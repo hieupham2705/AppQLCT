@@ -1,6 +1,8 @@
 package com.example.appqlct.actitities
 
+import android.app.AlertDialog
 import android.content.Intent
+import android.icu.util.Calendar
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.core.content.ContextCompat
@@ -17,7 +19,14 @@ import kotlinx.coroutines.launch
 
 class EditDirectoryActivity : AppCompatActivity() {
     private val binding by lazy { ActivityEditDirectoryBinding.inflate(layoutInflater) }
-    private val adapter by lazy { EditDirectoryAdapter(applicationContext) }
+    private val adapter by lazy { EditDirectoryAdapter(
+        ::onClickEdit,
+        ::onClickDelete,
+        applicationContext
+    ) }
+
+
+
     private val listDirectory = mutableListOf<DanhMuc>()
     private var thuCHi = true
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -102,5 +111,45 @@ class EditDirectoryActivity : AppCompatActivity() {
         } catch (e: Exception) {
             e.message
         }
+    }
+    private fun onClickDelete() {
+        showYesNoDialog()
+    }
+    private fun onClickEdit() {
+        val intent = Intent(this,AddDirectoryActivity::class.java)
+        intent.putExtra("name",adapter.getDanhMuc().tenDanhMuc)
+        intent.putExtra("id",adapter.getDanhMuc().Id)
+        startActivity(intent)
+    }
+    private fun showYesNoDialog()  {
+        val builder = AlertDialog.Builder(this)
+
+        // Thiết lập tiêu đề và nội dung của dialog
+        builder.setTitle("Câu hỏi")
+            .setMessage(
+                "Bạn có chắc chắn muốn danh mục này? Thao tác này không thể\n" +
+                        "hoàn tác lại."
+            )
+
+        // Thiết lập nút Yes
+        builder.setPositiveButton("Yes") { dialog, which ->
+            lifecycleScope.launch {
+                DataBaseManager.getInstance(applicationContext).getItemDAO().xoaDanhMuc(
+                    id = adapter.getDanhMuc().Id
+                        .toLong()
+                )
+            }
+
+            dialog.dismiss()
+        }
+
+        // Thiết lập nút No
+        builder.setNegativeButton("No") { dialog, which ->
+            dialog.dismiss()
+        }
+
+        // Hiển thị dialog
+        val dialog: AlertDialog = builder.create()
+        dialog.show()
     }
 }

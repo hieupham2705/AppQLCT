@@ -19,7 +19,14 @@ class AddDirectoryActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         binding.apply {
-            recyclerview.adapter = adapter
+            val id = intent.getIntExtra("id", -1)
+            if (id != -1){
+                edtName.editText?.setText(intent.getStringExtra("name"))
+                lifecycleScope.launch {
+                    DataBaseManager.getInstance(applicationContext).getItemDAO().xoaDanhMuc(id.toLong())
+                }
+            }
+                recyclerview.adapter = adapter
             imbtnBack.setOnClickListener {
                 finish()
             }
@@ -27,19 +34,23 @@ class AddDirectoryActivity : AppCompatActivity() {
                 if (!edtName.editText?.text.toString().isEmpty()) {
                     try {
                         lifecycleScope.launch {
-                            DataBaseManager.getInstance(applicationContext).getItemDAO().themDanhMuc(
-                                DanhMuc(
-                                    tenDanhMuc = edtName.editText?.text.toString(),
-                                    icon = convertDrawableToBase64(applicationContext,adapter.getIcon()),
-                                    thuChi = intent.getBooleanExtra("thuChi", true)
+                            DataBaseManager.getInstance(applicationContext).getItemDAO()
+                                .themDanhMuc(
+                                    DanhMuc(
+                                        tenDanhMuc = edtName.editText?.text.toString(),
+                                        icon = convertDrawableToBase64(
+                                            applicationContext,
+                                            adapter.getIcon()
+                                        ),
+                                        thuChi = intent.getBooleanExtra("thuChi", true)
+                                    )
                                 )
-                            )
                             Toast.makeText(
                                 applicationContext, "Đã lưu!", Toast.LENGTH_SHORT
                             ).show()
                             finish()
                         }
-                    }catch (e:Exception){
+                    } catch (e: Exception) {
                         e.message
                     }
                 } else {
