@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import com.anychart.anychart.AnyChart
 import com.anychart.anychart.DataEntry
 import com.anychart.anychart.ValueDataEntry
@@ -88,7 +89,7 @@ class ChartFragment : Fragment() {
     }
 
     private fun spendingAdapter() {
-        CoroutineScope(Dispatchers.Main).launch {
+        lifecycleScope.launch {
             val dataEntries = mutableListOf<DataEntry>()
             val spendingInChart = mutableListOf<SpendingInChart>()
             spd = 0
@@ -118,7 +119,7 @@ class ChartFragment : Fragment() {
     }
 
     private fun revenueAdapter() {
-        CoroutineScope(Dispatchers.Main).launch {
+        lifecycleScope.launch {
             val dataEntries = mutableListOf<DataEntry>()
             val spendingInChart = mutableListOf<SpendingInChart>()
             rv = 0

@@ -1,9 +1,11 @@
 package com.example.appqlct.extension
 
 import android.app.Activity
+import android.content.ContentResolver
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.net.Uri
 import android.util.Base64
 import android.view.LayoutInflater
 import android.view.View

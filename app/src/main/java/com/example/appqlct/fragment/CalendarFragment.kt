@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.example.appqlct.adapter.CalendarAdapter
 import com.example.appqlct.base.DataBaseManager
 import com.example.appqlct.databinding.FragmentCalendarBinding
@@ -59,7 +60,7 @@ class CalendarFragment : Fragment() {
     }
 
     private fun getData(year: Int, month: Int, day: Int) {
-        CoroutineScope(Dispatchers.Main).launch {
+        lifecycleScope.launch {
             listSpending.clear()
             listMoneySpendingInMonth.clear()
             listMoneyRevenueInMonth.clear()

@@ -8,7 +8,7 @@ import org.jetbrains.annotations.PropertyKey
 
 @Entity(
     "NguoiDung", foreignKeys = [ForeignKey(
-        entity = DanhMuc::class,
+        entity = HoaDon::class,
         parentColumns = ["Id"],
         childColumns = ["IdHoaDon"],
         onDelete = ForeignKey.NO_ACTION
@@ -18,14 +18,14 @@ data class NguoiDung(
     @PrimaryKey(true)
     val id: Int = 0,
     @ColumnInfo(name = "Ten")
-    val Ten: String? = "null",
+    val ten: String? = "null",
     @ColumnInfo(name = "Sdt")
-    val Sdt: String? = "null",
+    val sdt: String? = "null",
     @ColumnInfo(name = "KhoanChi")
-    val KhoanChi: String? = "null",
+    val khoanChi: Long? = 0,
     @ColumnInfo(name = "TrangThai")
-    val TrangThai: String? = "null",
+    val trangThai: Boolean? = true,
     // khoa ngoai
     @ColumnInfo(name = "IdHoaDon")
-    val IdHoaDon: Int? = 0
+    val idHoaDon: Int? = 0
 )

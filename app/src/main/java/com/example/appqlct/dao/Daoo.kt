@@ -6,6 +6,8 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.example.appqlct.model.DanhMuc
 import com.example.appqlct.model.GiaoDich
+import com.example.appqlct.model.HoaDon
+import com.example.appqlct.model.NguoiDung
 import com.example.appqlct.model.SpendingInChart
 
 @Dao
@@ -47,4 +49,10 @@ interface Daoo {
     suspend fun timKiemDanhMucChi(): List<DanhMuc>
     @Query("select * from DanhMuc where ThuChi = 0")
     suspend fun timKiemDanhMucThu(): List<DanhMuc>
+    // nguoi dung dao
+
+    @Query("select * from NguoiDung where IdHoaDon = :idHoaDon")
+    suspend fun timKiemNguoiDungTheoHoaDon(idHoaDon: Int): List<NguoiDung>
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun themNguoiDung(nguoiDung: NguoiDung) : Long
 }

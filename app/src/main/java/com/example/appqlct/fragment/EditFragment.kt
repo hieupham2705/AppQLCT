@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.example.appqlct.R
 import com.example.appqlct.actitities.EditDirectoryActivity
 import com.example.appqlct.adapter.DirectoryAdapter
@@ -53,7 +54,6 @@ class EditFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        getDanhMuc()
         binding.apply {
             recyclerview.adapter = adapter
             btnAccept.setOnClickListener {
@@ -132,7 +132,7 @@ class EditFragment : Fragment() {
                 ghiChu = edtNote.editText?.text.toString(),
                 thuChi = hieu
             )
-            CoroutineScope(Dispatchers.Main).launch {
+            lifecycleScope.launch {
                 giaoDich.idDanhMuc = DataBaseManager.getInstance(requireContext()).getItemDAO()
                     .themDanhMuc(danhMuc).toInt()
                 DataBaseManager.getInstance(requireContext()).getItemDAO()
@@ -143,6 +143,7 @@ class EditFragment : Fragment() {
     }
 
     private fun onClickTienThu() {
+        getDanhMucThu()
         binding.apply {
             btnTienThu.setBackgroundResource(R.color.pink)
             btnTienThu.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
@@ -155,6 +156,7 @@ class EditFragment : Fragment() {
     }
 
     private fun onClickTienChi() {
+        getDanhMucChi()
         binding.apply {
             btnTienChi.setBackgroundResource(R.color.pink)
             btnTienChi.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
@@ -162,7 +164,6 @@ class EditFragment : Fragment() {
             btnTienThu.setTextColor(ContextCompat.getColor(requireContext(), R.color.pink))
             tvSpendingMoneyOrRevenue.text = Constants.TIEN_CHI
             btnAccept.text = Constants.BTN_TIEN_CHI
-            adapter.setAdapter(listDirectorySpendingMoney)
         }
     }
 
@@ -171,17 +172,29 @@ class EditFragment : Fragment() {
         binding.tvDay.text = "$dayOfMonth/${month + 1}/$year"
         Log.e(TAG, "onDestroyView: hihi")
     }
-    private fun getDanhMuc(){
-        CoroutineScope(Dispatchers.Main).launch {
+
+    private fun getDanhMucChi() {
+        lifecycleScope.launch {
             listDirectorySpendingMoney.clear()
-            listDirectoryRevenue.clear()
             listDirectorySpendingMoney.addAll(
                 DataBaseManager.getInstance(requireContext()).getItemDAO().timKiemDanhMucChi()
             )
+            adapter.setAdapter(listDirectorySpendingMoney)
+        }
+    }
+
+    private fun getDanhMucThu() {
+        lifecycleScope.launch {
+            listDirectoryRevenue.clear()
             listDirectoryRevenue.addAll(
                 DataBaseManager.getInstance(requireContext()).getItemDAO().timKiemDanhMucThu()
             )
-            adapter.setAdapter(listDirectorySpendingMoney)
+            adapter.setAdapter(listDirectoryRevenue)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        getDanhMucChi()
     }
 }
