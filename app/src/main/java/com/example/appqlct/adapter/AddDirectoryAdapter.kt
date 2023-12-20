@@ -38,7 +38,7 @@ class AddDirectoryAdapter : RecyclerView.Adapter<AddDirectoryAdapter.ViewHolder>
         R.drawable.icon_5,
         R.drawable.icon_6,
         R.drawable.icon_7,
-        R.drawable.icon_8,
+        R.drawable.icon_8
     )
     private var item = 0
 

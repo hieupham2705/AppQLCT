@@ -74,20 +74,21 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:backgroundTint="@color/gray"
-        android:layout_marginTop="24dp"
-        android:textColor="@color/white"
         android:text="Quay lại"
-        app:layout_constraintStart_toStartOf="@+id/editTextNumber"
-        app:layout_constraintTop_toBottomOf="@+id/editTextNumber" />
+        android:textColor="@color/white"
+        app:layout_constraintEnd_toEndOf="@+id/edt_spending"
+        app:layout_constraintTop_toTopOf="@+id/btn_add_member" />
 
     <Button
         android:id="@+id/btn_add_member"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:backgroundTint="@color/pink"
-        android:textColor="@color/white"
         android:text="Thêm"
+        android:textColor="@color/white"
         app:layout_constraintEnd_toEndOf="@+id/editTextNumber"
-        app:layout_constraintTop_toTopOf="@+id/btn_back" />
+        app:layout_constraintStart_toStartOf="@+id/edt_spending"
+        app:layout_constraintTop_toBottomOf="@+id/edt_spending" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,79 +1,76 @@
-package com.example.appqlct.fragment
+package com.example.appqlct.actitities
 
 import android.app.DatePickerDialog
 import android.content.Intent
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.example.appqlct.R
-import com.example.appqlct.actitities.EditDirectoryActivity
 import com.example.appqlct.adapter.DirectoryAdapter
+import com.example.appqlct.adapter.EditSpendingDirectoryAdapter
 import com.example.appqlct.base.DataBaseManager
-import com.example.appqlct.databinding.FragmentEditBinding
+import com.example.appqlct.databinding.ActivityEditSpendingBinding
 import com.example.appqlct.define.Constants
-import com.example.appqlct.extension.convertDrawableToBase64
+import com.example.appqlct.define.Constants.showToast
 import com.example.appqlct.extension.showToast
 import com.example.appqlct.model.DanhMuc
-import com.example.appqlct.model.Directory
 import com.example.appqlct.model.GiaoDich
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.Calendar
 
-private const val TAG = "EditFragment"
+private const val TAG = "EditSpendingActivity"
 
-class EditFragment : Fragment() {
-
-    private val binding by lazy { FragmentEditBinding.inflate(layoutInflater) }
+class EditSpendingActivity : AppCompatActivity() {
+    private val binding by lazy { ActivityEditSpendingBinding.inflate(layoutInflater) }
+    private var giaoDich: GiaoDich = GiaoDich()
     private val listDirectorySpendingMoney = mutableListOf<DanhMuc>()
     private val listDirectoryRevenue = mutableListOf<DanhMuc>()
+    private val calendar = Calendar.getInstance()
     private val adapter by lazy {
-        DirectoryAdapter(
-            onCickEditDirectory = {
-                onCickEditDirectory()
+        EditSpendingDirectoryAdapter()
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(binding.root)
+        val id = intent.getIntExtra("id", -1)
+        if (id != 1) {
+            lifecycleScope.launch {
+                giaoDich = DataBaseManager.getInstance(applicationContext).getItemDAO()
+                    .timKiemGiaoDichTheoId(id)
+                giaoDich.namGiaoDich?.let { calendar.set(Calendar.YEAR, it) }
+                giaoDich.thangGiaoDich?.let { calendar.set(Calendar.MONTH, it-1) }
+                giaoDich.ngayGiaoDich?.let { calendar.set(Calendar.DAY_OF_MONTH, it) }
+                binding.apply {
+                    tvDay.text =
+                        "${giaoDich.ngayGiaoDich}/${giaoDich.thangGiaoDich}/${giaoDich.namGiaoDich}"
+                    edtNote.editText?.setText(giaoDich.ghiChu)
+                    edtSpendingMoney.editText?.setText(giaoDich.tien.toString())
+                }
             }
-        )
-    }
-
-    private fun onCickEditDirectory() {
-        startActivity(Intent(requireContext(), EditDirectoryActivity::class.java))
-    }
-
-    private var hieu = true
-    var calendar = Calendar.getInstance()
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+        }
         binding.apply {
-            tvDay.text = "${calendar.get(Calendar.DAY_OF_MONTH)}/${calendar.get(Calendar.MONTH) + 1}/${
-                calendar.get(Calendar.YEAR)
-            }"
             recyclerview.adapter = adapter
             btnAccept.setOnClickListener {
                 if (edtSpendingMoney.editText?.text.toString().isEmpty())
-                    showToast(Constants.PLS_ENTER_THE_AMOUNT)
+                    showToast(Constants.PLS_ENTER_THE_AMOUNT, applicationContext)
                 else
                     updateSpending()
             }
             imvAccept.setOnClickListener {
                 if (edtSpendingMoney.editText?.text.toString().isEmpty())
-                    showToast(Constants.PLS_ENTER_THE_AMOUNT)
+                    showToast(Constants.PLS_ENTER_THE_AMOUNT, applicationContext)
                 else
                     updateSpending()
             }
             btnTienChi.setOnClickListener {
-                hieu = true
+                giaoDich.thuChi = true
                 onClickTienChi()
             }
             btnTienThu.setOnClickListener {
-                hieu = false
+                giaoDich.thuChi = false
                 onClickTienThu()
             }
             tvDay.setOnClickListener {
@@ -95,17 +92,17 @@ class EditFragment : Fragment() {
                     }" // Month is zero-based
                 tvDay.text = selectedDate
             }
+            imbtnBack.setOnClickListener { finish() }
         }
-        return binding.root
     }
 
     private fun onClickday() {
         val datePicker = DatePickerDialog(
-            requireContext(), { view, yearPicker, monthPicker, dayOfMonthPicker ->
+            this,
+            { view, yearPicker, monthPicker, dayOfMonthPicker ->
                 // Xử lý khi người dùng chọn ngày
                 calendar.set(Calendar.YEAR, yearPicker)
-                calendar.set(Calendar.MONTH, monthPicker)
-                Log.e(TAG, "onClickday: $monthPicker")
+                calendar.set(Calendar.MONTH, monthPicker )
                 calendar.set(Calendar.DAY_OF_MONTH, dayOfMonthPicker)
                 val selectedDate =
                     "${calendar.get(Calendar.DAY_OF_MONTH)}/${calendar.get(Calendar.MONTH) + 1}/${
@@ -113,33 +110,30 @@ class EditFragment : Fragment() {
                     }" // Month is zero-based
                 binding.tvDay.text = selectedDate
             },
-            calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH)
         )
         datePicker.show()
     }
 
     private fun updateSpending() {
         binding.apply {
-            val giaoDich = GiaoDich(
-                ngayGiaoDich = calendar.get(Calendar.DAY_OF_MONTH),
-                thangGiaoDich = calendar.get(Calendar.MONTH) + 1,
-                namGiaoDich = calendar.get(Calendar.YEAR),
-                tien = edtSpendingMoney.editText?.text.toString().toLong(),
-                ghiChu = edtNote.editText?.text.toString(),
-                thuChi = hieu
-            )
-            if (hieu)
+            giaoDich.ngayGiaoDich = calendar.get(Calendar.DAY_OF_MONTH)
+            giaoDich.thangGiaoDich = calendar.get(Calendar.MONTH) + 1
+            giaoDich.namGiaoDich = calendar.get(Calendar.YEAR)
+            giaoDich.tien = edtSpendingMoney.editText?.text.toString().toLong()
+            giaoDich.ghiChu = edtNote.editText?.text.toString()
+            if (giaoDich.thuChi == true)
                 giaoDich.idDanhMuc = listDirectorySpendingMoney[adapter.getIndex()].Id
             else
                 giaoDich.idDanhMuc = listDirectoryRevenue[adapter.getIndex()].Id
             lifecycleScope.launch {
-                DataBaseManager.getInstance(requireContext()).getItemDAO()
-                    .themNguoiGiaoDich(giaoDich)
-
-                showToast(Constants.ADD_SUCCESSFUL)
+                DataBaseManager.getInstance(applicationContext).getItemDAO()
+                    .capNhatGiaoDich(giaoDich)
+                showToast(Constants.UPDATE_SUCCESSFUL, applicationContext)
+                finish()
             }
-            edtNote.editText?.text = null
-            edtSpendingMoney.editText?.text = null
         }
     }
 
@@ -147,9 +141,9 @@ class EditFragment : Fragment() {
         getDanhMucThu()
         binding.apply {
             btnTienThu.setBackgroundResource(R.color.pink)
-            btnTienThu.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+            btnTienThu.setTextColor(ContextCompat.getColor(applicationContext, R.color.white))
             btnTienChi.setBackgroundResource(R.drawable.border_btn_tienthu)
-            btnTienChi.setTextColor(ContextCompat.getColor(requireContext(), R.color.pink))
+            btnTienChi.setTextColor(ContextCompat.getColor(applicationContext, R.color.pink))
             tvSpendingMoneyOrRevenue.text = Constants.TIEN_THU
             btnAccept.text = Constants.BTN_TIEN_THU
             adapter.setAdapter(listDirectoryRevenue)
@@ -160,9 +154,9 @@ class EditFragment : Fragment() {
         getDanhMucChi()
         binding.apply {
             btnTienChi.setBackgroundResource(R.color.pink)
-            btnTienChi.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+            btnTienChi.setTextColor(ContextCompat.getColor(applicationContext, R.color.white))
             btnTienThu.setBackgroundResource(R.drawable.border_btn_tienthu)
-            btnTienThu.setTextColor(ContextCompat.getColor(requireContext(), R.color.pink))
+            btnTienThu.setTextColor(ContextCompat.getColor(applicationContext, R.color.pink))
             tvSpendingMoneyOrRevenue.text = Constants.TIEN_CHI
             btnAccept.text = Constants.BTN_TIEN_CHI
         }
@@ -172,7 +166,7 @@ class EditFragment : Fragment() {
         lifecycleScope.launch {
             listDirectorySpendingMoney.clear()
             listDirectorySpendingMoney.addAll(
-                DataBaseManager.getInstance(requireContext()).getItemDAO().timKiemDanhMucChi()
+                DataBaseManager.getInstance(applicationContext).getItemDAO().timKiemDanhMucChi()
             )
             adapter.setAdapter(listDirectorySpendingMoney)
         }
@@ -182,7 +176,7 @@ class EditFragment : Fragment() {
         lifecycleScope.launch {
             listDirectoryRevenue.clear()
             listDirectoryRevenue.addAll(
-                DataBaseManager.getInstance(requireContext()).getItemDAO().timKiemDanhMucThu()
+                DataBaseManager.getInstance(applicationContext).getItemDAO().timKiemDanhMucThu()
             )
             adapter.setAdapter(listDirectoryRevenue)
         }
@@ -190,7 +184,7 @@ class EditFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        if (hieu)
+        if (giaoDich.thuChi == true)
             getDanhMucChi()
         else
             getDanhMucThu()

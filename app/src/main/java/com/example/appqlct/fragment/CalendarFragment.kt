@@ -1,6 +1,7 @@
 package com.example.appqlct.fragment
 
 import android.app.AlertDialog
+import android.content.Intent
 import android.icu.util.Calendar
 import android.os.Bundle
 import android.util.Log
@@ -9,9 +10,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import com.example.appqlct.actitities.EditSpendingActivity
 import com.example.appqlct.adapter.CalendarAdapter
 import com.example.appqlct.base.DataBaseManager
 import com.example.appqlct.databinding.FragmentCalendarBinding
+import com.example.appqlct.extension.showToast
 import com.example.appqlct.model.GiaoDich
 import com.example.appqlct.model.SpendingInCalendar
 import kotlinx.coroutines.CoroutineScope
@@ -30,9 +33,12 @@ class CalendarFragment : Fragment() {
     private val adapter by lazy {
         CalendarAdapter(
             ::onClickDelete,
+            ::onClickEdit,
             requireContext()
         )
     }
+
+
     private val calendar = Calendar.getInstance()
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -45,15 +51,6 @@ class CalendarFragment : Fragment() {
         }
         binding.recyclerview.adapter = adapter
         return binding.root
-    }
-
-    override fun onStart() {
-        getData(
-            calendar.get(Calendar.YEAR),
-            calendar.get(Calendar.MONTH) + 1,
-            calendar.get(Calendar.DAY_OF_MONTH)
-        )
-        super.onStart()
     }
 
     override fun onResume() {
@@ -102,7 +99,8 @@ class CalendarFragment : Fragment() {
     private fun getList() {
         listAdapter.clear()
         listSpending.forEach {
-            var spendingInCalendar = SpendingInCalendar(0, it.idDanhMuc, it.Id, it.tien, it.thuChi)
+            var spendingInCalendar =
+                SpendingInCalendar(0, it.idDanhMuc, it.Id, it.tien, it.ghiChu, it.thuChi)
             listAdapter.add(spendingInCalendar)
         }
     }
@@ -111,7 +109,13 @@ class CalendarFragment : Fragment() {
         showYesNoDialog()
     }
 
-    private fun showYesNoDialog()  {
+    private fun onClickEdit(id: Int) {
+        val intent = Intent(requireContext(), EditSpendingActivity::class.java)
+        intent.putExtra("id",id)
+        startActivity(intent)
+    }
+
+    private fun showYesNoDialog() {
         val builder = AlertDialog.Builder(context)
 
         // Thiết lập tiêu đề và nội dung của dialog

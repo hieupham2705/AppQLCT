@@ -5,5 +5,6 @@ data class SpendingInCalendar(
     val idDirectory: Int? = 0,
     val idGiaoDich: Int? = 0,
     val money: Long? = 0,
+    val note: String ?="",
     val check : Boolean ?= true
 )

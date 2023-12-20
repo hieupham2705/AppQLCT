@@ -28,9 +28,18 @@
         android:id="@+id/tv_name_diretory"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
         android:text="Ăn uống"
         android:textColor="@color/black"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tv_name_note"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:layout_weight="1"
+        android:gravity="center"
+        android:textColor="@color/gray"
         android:textStyle="bold" />
 
     <TextView

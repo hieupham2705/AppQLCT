@@ -127,7 +127,7 @@ class EditDirectoryActivity : AppCompatActivity() {
         // Thiết lập tiêu đề và nội dung của dialog
         builder.setTitle("Câu hỏi")
             .setMessage(
-                "Bạn có chắc chắn muốn danh mục này? Thao tác này không thể\n" +
+                "Bạn có chắc chắn muốn xóa danh mục này? Thao tác này không thể\n" +
                         "hoàn tác lại."
             )
 

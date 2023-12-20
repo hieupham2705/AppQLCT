@@ -10,6 +10,7 @@ object Constants {
     const val BTN_TIEN_CHI = "Nhập khoản tiền chi"
     const val BTN_TIEN_THU = "Nhập khoản tiền thu"
     const val ADD_SUCCESSFUL = "Thêm thành công"
+    const val UPDATE_SUCCESSFUL = "Cập nhật thành công"
     const val PLS_ENTER_THE_AMOUNT = "Vui lòng nhâp số tiền"
 
     fun showToast(string: String?, context: Context?) {

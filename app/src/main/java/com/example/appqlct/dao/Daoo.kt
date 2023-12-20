@@ -5,6 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 import com.example.appqlct.model.DanhMuc
 import com.example.appqlct.model.GiaoDich
 import com.example.appqlct.model.HoaDon
@@ -44,6 +45,11 @@ interface Daoo {
 
     @Query("DELETE FROM giaodich where Id = :id")
     suspend fun xoaGiaoDich(id : Long)
+
+    @Query("select * from GiaoDich where Id = :id")
+    suspend fun timKiemGiaoDichTheoId(id: Int): GiaoDich
+    @Update
+    suspend fun capNhatGiaoDich(giaoDich: GiaoDich)
     // Danhmucdao
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun themDanhMuc(danhMuc: DanhMuc): Long

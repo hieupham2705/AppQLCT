@@ -13,6 +13,7 @@ import com.example.appqlct.databinding.ItemDirectoryBinding
 import com.example.appqlct.databinding.ItemNothingBinding
 import com.example.appqlct.databinding.ItemSpendingBinding
 import com.example.appqlct.databinding.ItemTimeBinding
+import com.example.appqlct.define.Constants
 import com.example.appqlct.extension.decodeBase64ToBitmap
 import com.example.appqlct.model.SpendingInCalendar
 import kotlinx.coroutines.CoroutineScope
@@ -23,6 +24,7 @@ private const val TAG = "CalendarAdapter"
 
 class CalendarAdapter(
     private val onClickDelete: () -> Unit,
+    private val onClickEdit: (id:Int) -> Unit,
     private val context: Context
 ) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -70,8 +72,11 @@ class CalendarAdapter(
                 listSpending[position - 1].avtSpending?.let { imvAvtSpending.setImageResource(it) }
                 root.setOnLongClickListener {
                     showPopupMenu(holder.itemView)
-                    id = listSpending[position-1].idGiaoDich!!
+                    id = listSpending[position - 1].idGiaoDich!!
                     true
+                }
+                root.setOnClickListener {
+                    onClickEdit.invoke(listSpending[position-1].idGiaoDich!!)
                 }
                 CoroutineScope(Dispatchers.Main).launch {
                     val danhMuc =
@@ -80,6 +85,7 @@ class CalendarAdapter(
                     tvNameDiretory.text = danhMuc.tenDanhMuc
                     imvAvtSpending.setImageBitmap(decodeBase64ToBitmap(danhMuc.icon!!))
                 }
+                tvNameNote.text = listSpending[position-1].note
                 if (listSpending[position - 1].check == true)
                     tvSpendingMoney.text = "-" + listSpending[position - 1].money
                 else
@@ -109,6 +115,7 @@ class CalendarAdapter(
                     onClickDelete.invoke()
                     true
                 }
+
                 else -> false
             }
         }
